@@ -8,4 +8,19 @@ use Illuminate\Database\Eloquent\Model;
 class Restock extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'user_id',
+        'item_id',
+        'initial_stock',
+        'updated_stock',
+    ];
+
+    public function user() {
+        return $this->belongsTo(User::class);
+    }
+    
+    public function item() {
+        return $this->belongsTo(Item::class);
+    }
 }
