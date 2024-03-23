@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\AutorepairShop;
-use App\Http\Requests\StoreAutorepairShopRequest;
-use App\Http\Requests\UpdateAutorepairShopRequest;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\http\Request;
 
 class AutorepairShopController extends Controller
 {
@@ -13,7 +13,20 @@ class AutorepairShopController extends Controller
      */
     public function index()
     {
-        //
+        // if (Auth::user()->role != 'superadmin')
+        // {
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => 'Anda tidak memiliki akses'
+        //     ], 401);
+        // }
+        $shops = AutorepairShop::all();
+        return response()->json([
+            'success' => true,
+            'message' => 'Daftar Bengkel',
+            'data'    => $shops
+        ], 200);
+
     }
 
     /**
@@ -27,17 +40,67 @@ class AutorepairShopController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreAutorepairShopRequest $request)
+    public function store(Request $request)
     {
-        //
+        // if (Auth::user()->role != 'superadmin')
+        // {
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => 'Anda tidak memiliki akses'
+        //     ], 401);
+        // }
+        $this->validate($request, [
+            'name' => 'required',
+            'address' => 'required',
+            'phone_number' => 'required',
+            'details' => 'required',
+            'logo' => 'required',
+            'image' => 'required'
+        ]);
+
+        $shop = new AutorepairShop();
+        $shop->name = $request->name;
+        $shop->address = $request->address;
+        $shop->phone_number = $request->phone_number;
+        $shop->details = $request->details;
+        
+        $shop->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Bengkel berhasil ditambahkan',
+            'data'    => $shop
+        ], 200);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(AutorepairShop $autorepairShop)
+    public function show($id)
     {
-        //
+        // if (Auth::user()->role != 'superadmin')
+        // {
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => 'Anda tidak memiliki akses'
+        //     ], 401);
+        // }
+        $shop = AutorepairShop::find($id);
+        if ($shop)
+        {
+            return response()->json([
+                'success' => true,
+                'message' => 'Detail Bengkel',
+                'data'    => $shop
+            ], 200);
+        }
+        else
+        {
+            return response()->json([
+                'success' => false,
+                'message' => 'Bengkel tidak ditemukan'
+            ], 404);
+        }
     }
 
     /**
@@ -51,9 +114,45 @@ class AutorepairShopController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateAutorepairShopRequest $request, AutorepairShop $autorepairShop)
+    public function update(Request $request, AutorepairShop $autorepairShop)
     {
-        //
+        // if (Auth::user()->role != 'superadmin')
+        // {
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => 'Anda tidak memiliki akses'
+        //     ], 401);
+        // }
+        $this->validate($request, [
+            'name' => 'required',
+            'address' => 'required',
+            'phone_number' => 'required',
+            'details' => 'required',
+            'logo' => 'required',
+            'image' => 'required'
+        ]);
+
+        $shop = AutorepairShop::find($autorepairShop);
+        if ($shop)
+        {
+            $shop->name = $request->name;
+            $shop->address = $request->address;
+            $shop->phone_number = $request->phone_number;
+            $shop->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Bengkel berhasil diupdate',
+                'data'    => $shop
+            ], 200);
+        }
+        else
+        {
+            return response()->json([
+                'success' => false,
+                'message' => 'Bengkel tidak ditemukan'
+            ], 404);
+        }
     }
 
     /**
@@ -61,6 +160,28 @@ class AutorepairShopController extends Controller
      */
     public function destroy(AutorepairShop $autorepairShop)
     {
-        //
+        // if (Auth::user()->role != 'superadmin')
+        // {
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => 'Anda tidak memiliki akses'
+        //     ], 401);
+        // }
+        $shop = AutorepairShop::find($autorepairShop);
+        if ($shop)
+        {
+            $shop->delete();
+            return response()->json([
+                'success' => true,
+                'message' => 'Bengkel berhasil dihapus'
+            ], 200);
+        }
+        else
+        {
+            return response()->json([
+                'success' => false,
+                'message' => 'Bengkel tidak ditemukan'
+            ], 404);
+        }
     }
 }
